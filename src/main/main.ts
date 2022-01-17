@@ -11,11 +11,15 @@
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
+
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
+import db from './db'
+import { initItemModel } from './db/item'
+import mountIpcListener from './ipc-listener/mount'
 
 export default class AppUpdater {
   constructor() {
@@ -27,10 +31,10 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`
-  console.log(msgTemplate(arg))
-  event.reply('ipc-example', msgTemplate('pong'))
+db.serialize(() => {
+  initItemModel()
+
+  mountIpcListener()
 })
 
 if (process.env.NODE_ENV === 'production') {
@@ -120,6 +124,7 @@ app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
+    db.close()
     app.quit()
   }
 })
