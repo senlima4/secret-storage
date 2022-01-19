@@ -1,9 +1,8 @@
 import { ipcMain } from 'electron-better-ipc'
 
-import ItemController, {
-  EditItemVariables,
-  UpdateItemPayload,
-} from '../controller/item'
+import { UpdateItemPayload, EditableItemVariables } from '@/typings'
+
+import ItemController from '../controller/item'
 
 export default function ItemListener() {
   ipcMain.answerRenderer('list-items', async () => {
@@ -11,12 +10,17 @@ export default function ItemListener() {
     return result
   })
 
+  ipcMain.answerRenderer('read-item', async (id: string) => {
+    const result = await ItemController.findById(id)
+    return result
+  })
+
   ipcMain.answerRenderer(
     'create-item',
-    async (variables: EditItemVariables) => {
+    async (variables: EditableItemVariables) => {
       try {
-        const result = await ItemController.createOne(variables)
-        return result
+        await ItemController.createOne(variables)
+        return true
       } catch (err) {
         return false
       }
@@ -34,11 +38,8 @@ export default function ItemListener() {
 
   ipcMain.answerRenderer('update-item', async (payload: UpdateItemPayload) => {
     try {
-      const result = await ItemController.updateOne(
-        payload.id,
-        payload.variables
-      )
-      return result
+      await ItemController.updateOne(payload)
+      return true
     } catch (err) {
       return false
     }

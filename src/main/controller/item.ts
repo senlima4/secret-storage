@@ -1,46 +1,35 @@
 import * as uuid from 'uuid'
-import * as argon2 from 'argon2'
+
+import { EditableItemVariables, UpdateItemPayload } from '@/typings'
 
 import db from '../db'
 import { Item, ITEM_STMT } from '../db/item'
 
-export interface EditItemVariables {
-  title: string
-  about?: string
-  value: string
-}
-
-export interface UpdateItemPayload {
-  id: string
-  variables: EditItemVariables
-}
-
 interface IItemController {
-  createOne: (variables: EditItemVariables) => Promise<void>
-  updateOne: (id: string, variables: EditItemVariables) => Promise<void>
+  createOne: (variables: EditableItemVariables) => Promise<void>
+  updateOne: (payload: UpdateItemPayload) => Promise<void>
   deleteOne: (id: string) => Promise<void>
   findAll: () => Promise<Item[]>
+  findById: (id: string) => Promise<Item | null>
 }
 
 const controller: IItemController = {
   async createOne({ title, about, value }) {
     const stmt = db.prepare(ITEM_STMT.INSERT)
-
     stmt.run(
       uuid.v4(),
       title,
       about || null,
-      await argon2.hash(value),
+      JSON.stringify(value),
       new Date().getTime()
     )
   },
-  async updateOne(id, { title, about, value }) {
+  async updateOne({ id, variables: { title, about, value } }) {
     const stmt = db.prepare(ITEM_STMT.UPDATE)
-
     stmt.run(
       title,
       about || null,
-      await argon2.hash(value),
+      JSON.stringify(value),
       new Date().getTime(),
       id
     )
@@ -51,10 +40,22 @@ const controller: IItemController = {
   },
   async findAll() {
     let result: Item[] = []
+
     const stmt = db.prepare(ITEM_STMT.GET_ALL)
     stmt.all((err, rows: Item[]) => {
       if (err) throw err
       result = rows
+    })
+
+    return result
+  },
+  async findById(id) {
+    let result: Item | null = null
+
+    const stmt = db.prepare(ITEM_STMT.GET_BY_ID)
+    stmt.get(id, (err, row: Item) => {
+      if (err) throw err
+      result = row
     })
 
     return result

@@ -2,9 +2,12 @@
  * Base webpack config used across other specific configs
  */
 
+import path from 'path'
 import webpack from 'webpack'
 import webpackPaths from './webpack.paths'
 import { dependencies as externals } from '../../release/app/package.json'
+
+const rootDir = process.cwd()
 
 const configuration: webpack.Configuration = {
   externals: [...Object.keys(externals || {})],
@@ -41,6 +44,10 @@ const configuration: webpack.Configuration = {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [webpackPaths.srcPath, 'node_modules'],
+    alias: {
+      '@': path.join(rootDir, 'src'),
+      '@renderer': path.join(rootDir, 'src/renderer'),
+    },
   },
 
   plugins: [
