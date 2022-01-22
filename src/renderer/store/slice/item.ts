@@ -25,7 +25,7 @@ const createItemSlice = (
   },
   deleteItem: async id => {
     await caller.deleteItem(id)
-    set(state => ({ ...state, items: state.items.filter(i => i.id !== id) }))
+    set(state => ({ ...state, focusId: null }))
   },
 })
 

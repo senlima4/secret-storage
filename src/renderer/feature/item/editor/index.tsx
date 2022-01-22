@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { FiAlertCircle } from 'react-icons/fi'
-import { Box, VStack, Button, Text, Icon } from '@chakra-ui/react'
+import { Box, Flex, Button, Text, Icon } from '@chakra-ui/react'
 
 import { EditableItemVariables } from '@/typings'
 
@@ -17,6 +17,7 @@ const ItemEditor: React.FC = () => {
   const items = useStore(state => state.items)
   const allItem = useStore(state => state.allItem)
   const updateItem = useStore(state => state.updateItem)
+  const deleteItem = useStore(state => state.deleteItem)
 
   const focusItem = React.useMemo(
     () => items.find(item => item.id === focusId),
@@ -26,6 +27,12 @@ const ItemEditor: React.FC = () => {
   const toggleMode = React.useCallback(() => {
     setMode(prevMode => (prevMode === 'edit' ? 'display' : 'edit'))
   }, [])
+
+  const handleDelete = React.useCallback(async () => {
+    if (!focusId) return
+    await deleteItem(focusId)
+    await allItem()
+  }, [focusId])
 
   const handleEdit = React.useCallback(
     async (data: EditableItemVariables) => {
@@ -38,10 +45,17 @@ const ItemEditor: React.FC = () => {
 
   if (!focusItem) {
     return (
-      <VStack w="full" h="100%" spacing={2}>
-        <Icon icon={<FiAlertCircle />} />
-        <Text>No item select</Text>
-      </VStack>
+      <Flex
+        w="full"
+        h="full"
+        flexDir="column"
+        align="center"
+        justify="center"
+        color="gray.400"
+      >
+        <Icon as={FiAlertCircle} w={8} h={8} />
+        <Text mt={1}>No item select</Text>
+      </Flex>
     )
   }
 
@@ -50,6 +64,9 @@ const ItemEditor: React.FC = () => {
       <Box p={4}>
         <Button size="sm" type="button" onClick={toggleMode}>
           Toggle display/edit
+        </Button>
+        <Button size="sm" ml={1} type="button" onClick={handleDelete}>
+          Delete
         </Button>
       </Box>
       <Box px={4} w="full" pos="relative">
