@@ -1,7 +1,9 @@
-import type { Item, EditableItemVariables, AccountMode } from '@/typings'
+import type { ParsedItem, EditableItemVariables, AccountMode } from '@/typings'
 
 export interface ItemSlice {
-  items: Item[]
+  items: ParsedItem[]
+  focusId: string | null
+  setFocusId: (id: string | null) => void
   allItem: () => Promise<void>
   createItem: (item: EditableItemVariables) => Promise<void>
   updateItem: (id: string, item: EditableItemVariables) => Promise<void>

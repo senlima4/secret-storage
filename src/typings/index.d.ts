@@ -10,10 +10,14 @@ export interface Item {
   createdAt: number
   updatedAt: number | null
 }
-
 export interface ItemValueNode {
   name: string
   value: string
+}
+
+export interface ParsedItem
+  extends Pick<Item, 'id' | 'title' | 'about' | 'createdAt' | 'updatedAt'> {
+  value: ItemValueNode[]
 }
 
 export interface EditableItemVariables {

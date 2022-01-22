@@ -1,5 +1,6 @@
 import type {
   Item,
+  ParsedItem,
   UpdateItemPayload,
   EditableItemVariables,
   AccountMode,
@@ -9,8 +10,8 @@ interface IPCCaller {
   getCurrentMode: () => Promise<AccountMode>
   initPassword: (value: string) => Promise<string>
 
-  listItems: () => Promise<Item[]>
-  readItem: (id: string) => Promise<Item | null>
+  listItems: () => Promise<ParsedItem[]>
+  readItem: (id: string) => Promise<ParsedItem | null>
   createItem: (variables: EditableItemVariables) => Promise<boolean>
   updateItem: (payload: UpdateItemPayload) => Promise<boolean>
   deleteItem: (id: string) => Promise<boolean>
@@ -30,11 +31,11 @@ const caller: IPCCaller = {
 
   listItems: async () => {
     const res = await ipc.callMain('list-items')
-    return res as Item[]
+    return res as ParsedItem[]
   },
   readItem: async (id: string) => {
     const res = await ipc.callMain('read-item', id)
-    return res as Item | null
+    return res as ParsedItem | null
   },
   createItem: async variables => {
     const res = await ipc.callMain('create-item', variables)

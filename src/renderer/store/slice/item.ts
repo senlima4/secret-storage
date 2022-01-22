@@ -9,6 +9,10 @@ const createItemSlice = (
   get: GetState<StoreState>
 ): ItemSlice => ({
   items: [],
+  focusId: null,
+  setFocusId: id => {
+    set(state => ({ ...state, focusId: id }))
+  },
   allItem: async () => {
     const items = await caller.listItems()
     set(state => ({ ...state, items }))

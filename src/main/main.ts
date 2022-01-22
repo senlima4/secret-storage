@@ -31,11 +31,11 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null
 
-db.serialize(() => {
-  initItemModel()
+db.serialize()
 
-  mountIpcListener()
-})
+initItemModel()
+
+mountIpcListener()
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support')

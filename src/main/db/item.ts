@@ -10,7 +10,7 @@ export interface Item {
 }
 
 export const initItemModel = () => {
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS item (
       id        TEXT    PRIMARY KEY  NOT NULL,
       title     TEXT    NOT NULL     UNIQUE,
@@ -24,10 +24,10 @@ export const initItemModel = () => {
 
 export const ITEM_STMT = Object.freeze({
   INSERT:
-    'INSERT INTO item (id, title, about, value, createdAt) VALUES (?, ?, ?, ?, ?, ?)',
+    'INSERT INTO item (id, title, about, value, createdAt) VALUES (?, ?, ?, ?, ?);',
   UPDATE:
-    'UPDATE item SET title = ?, about = ?, value = ?, updatedAt = ? WHERE id = ?',
-  REMOVE: 'DELETE FROM item WHERE id = ?',
-  GET_BY_ID: 'SELECT * FROM item WHERE id = ?',
-  GET_ALL: 'SELECT * FROM item',
+    'UPDATE item SET title = ?, about = ?, value = ?, updatedAt = ? WHERE id = ?;',
+  REMOVE: 'DELETE FROM item WHERE id = ?;',
+  GET_BY_ID: 'SELECT * FROM item WHERE id = ?;',
+  GET_ALL: `SELECT * FROM item;`,
 })

@@ -1,6 +1,11 @@
 import * as uuid from 'uuid'
 
-import { EditableItemVariables, UpdateItemPayload } from '@/typings'
+import {
+  ParsedItem,
+  ItemValueNode,
+  EditableItemVariables,
+  UpdateItemPayload,
+} from '@/typings'
 
 import db from '../db'
 import { Item, ITEM_STMT } from '../db/item'
@@ -9,8 +14,8 @@ interface IItemController {
   createOne: (variables: EditableItemVariables) => Promise<void>
   updateOne: (payload: UpdateItemPayload) => Promise<void>
   deleteOne: (id: string) => Promise<void>
-  findAll: () => Promise<Item[]>
-  findById: (id: string) => Promise<Item | null>
+  findAll: () => ParsedItem[]
+  findById: (id: string) => Promise<ParsedItem | null>
 }
 
 const controller: IItemController = {
@@ -38,27 +43,24 @@ const controller: IItemController = {
     const stmt = db.prepare(ITEM_STMT.REMOVE)
     stmt.run(id)
   },
-  async findAll() {
-    let result: Item[] = []
-
+  findAll() {
     const stmt = db.prepare(ITEM_STMT.GET_ALL)
-    stmt.all((err, rows: Item[]) => {
-      if (err) throw err
-      result = rows
-    })
+    const raw = stmt.all() as Item[]
 
+    const result: ParsedItem[] = raw.map(item => ({
+      ...item,
+      value: JSON.parse(item.value) as ItemValueNode[],
+    }))
     return result
   },
   async findById(id) {
-    let result: Item | null = null
-
     const stmt = db.prepare(ITEM_STMT.GET_BY_ID)
-    stmt.get(id, (err, row: Item) => {
-      if (err) throw err
-      result = row
-    })
+    const raw = stmt.get(id) as Item
 
-    return result
+    return {
+      ...raw,
+      value: JSON.parse(raw.value) as ItemValueNode[],
+    }
   },
 }
 
