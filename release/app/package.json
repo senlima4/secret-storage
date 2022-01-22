@@ -15,6 +15,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "argon2": "^0.28.3",
     "better-sqlite3": "^7.5.0"
   }
 }
